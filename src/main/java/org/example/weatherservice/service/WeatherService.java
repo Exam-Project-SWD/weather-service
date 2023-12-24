@@ -13,9 +13,15 @@ public class WeatherService {
     private final RestClient restClient;
 
     // Slightly annoying having to add the common API key to every request, but this is the simplest solution.
+    // Adding default URI parameters to the Bean gets overwritten by the URI parameters in the request.
+    // We could maybe use an interceptor to add the API key to every request.
     @Value("${WEATHER_API_KEY}")
     private String apiKey;
 
+    // TODO: Error handling
+
+    // We can also use Nominatim to get the location from an address.
+    // If the weather data is precise down to the actual coordinates, this would be nicer than just zip code.
     public Location getLocation(String zipCode, String countryCode) {
         return restClient.get()
                 .uri("geo/1.0/zip?zip={zip},{countryCode}&appid={apiKey}", zipCode, countryCode, apiKey)
