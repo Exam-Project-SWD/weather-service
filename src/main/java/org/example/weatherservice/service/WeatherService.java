@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @Service
 public class WeatherService {
@@ -34,5 +36,27 @@ public class WeatherService {
                 .uri("data/2.5/weather?lat={lat}&lon={lon}&appid={apiKey}&units=metric&mode=json", lat, lon, apiKey)
                 .retrieve()
                 .body(WeatherInformation.class);
+    }
+
+    public List<WeatherInformation.Weather> getBadWeather(WeatherInformation weatherInformation) {
+        // This checks the weather objects.
+        // We could also check weather conditions in the main object like visibility or wind.
+        // The return value and structure might need to change in that case.
+        return weatherInformation.weather().stream().filter(this::isBadWeather).toList();
+    }
+
+    public boolean isBadWeather(WeatherInformation.Weather weather) {
+        int id = weather.id();
+
+        // check bands of weather codes and check severity
+        if (id < 300) {
+            return true;
+        } else if (id < 400) {
+            return id >= 312;
+        } else if (id < 600) {
+            return id >= 502;
+        } else if (id < 700) {
+            return id >= 601;
+        } else return id < 800;
     }
 }
