@@ -1,4 +1,6 @@
 package org.example.weatherservice.model;
 
-public record BadWeatherReport(int customerId, WeatherInformation.Weather weather) {
+import java.util.List;
+
+public record BadWeatherReport(int customerId, List<WeatherInformation.Weather> weather) {
 }
