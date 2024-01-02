@@ -24,6 +24,7 @@ public class WeatherService {
 
     // We can also use Nominatim to get the location from an address.
     // If the weather data is precise down to the actual coordinates, this would be nicer than just zip code.
+    // If using zip code, we should cache results to avoid unnecessary requests. Location of cities doesn't change often.
     public Location getLocation(String zipCode, String countryCode) {
         return restClient.get()
                 .uri("geo/1.0/zip?zip={zip},{countryCode}&appid={apiKey}", zipCode, countryCode, apiKey)
