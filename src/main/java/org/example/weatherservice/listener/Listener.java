@@ -2,10 +2,7 @@ package org.example.weatherservice.listener;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.weatherservice.model.BadWeatherReport;
-import org.example.weatherservice.model.Location;
-import org.example.weatherservice.model.Order;
-import org.example.weatherservice.model.WeatherInformation;
+import org.example.weatherservice.model.*;
 import org.example.weatherservice.service.KafkaService;
 import org.example.weatherservice.service.WeatherService;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -33,10 +30,10 @@ public class Listener {
         String countryCode = order.address() != null && order.address().countryCode() != null ? order.address().countryCode() : "dk";
 
         Location location = weatherService.getLocation(zipCode, countryCode);
-        WeatherInformation weatherInformation = weatherService.getWeather(location.lat(), location.lon());
-        log.info("Weather information: {}", weatherInformation);
+        Weather weather = weatherService.getWeather(location.lat(), location.lon());
+        log.info("Weather information: {}", weather);
 
-        List<WeatherInformation.Weather> badWeather = weatherService.getBadWeather(weatherInformation);
+        List<Cause> badWeather = weatherService.getBadWeather(weather);
         log.info("Bad weather: {}", badWeather);
         if (!badWeather.isEmpty()) {
             kafkaService.sendBadWeatherReport(new BadWeatherReport(order.customerId(), badWeather));

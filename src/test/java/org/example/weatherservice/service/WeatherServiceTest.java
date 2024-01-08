@@ -1,6 +1,8 @@
 package org.example.weatherservice.service;
 
-import org.example.weatherservice.model.WeatherInformation;
+import org.example.weatherservice.enums.BadWeatherType;
+import org.example.weatherservice.model.Cause;
+import org.example.weatherservice.model.Weather;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,50 +27,51 @@ class WeatherServiceTest {
     @Test
     void givenBadWeather_whenCheckingForBadWeather_thenReturnTrue() {
         // Arrange
-        WeatherInformation.Weather badWeather = new WeatherInformation.Weather(202, "Thunderstorm", " thunderstorm with heavy rain ", "11d");
+        Weather.Condition badWeather = new Weather.Condition(202, "Thunderstorm", " thunderstorm with heavy rain ", "11d");
 
         // Act
-        boolean isBadWeather = weatherService.isBadWeather(badWeather);
+        Cause isBadWeather = weatherService.isBadWeather(badWeather);
 
         // Assert
-        assertTrue(isBadWeather);
+        assertNotNull(isBadWeather);
+        assertEquals(BadWeatherType.THUNDERSTORM, isBadWeather.type());
     }
 
     @Test
     void givenGoodWeather_whenCheckingForBadWeather_thenReturnFalse() {
         // Arrange
-        WeatherInformation.Weather goodWeather = new WeatherInformation.Weather(800, "Clear", "clear sky", "01d");
+        Weather.Condition goodWeather = new Weather.Condition(800, "Clear", "clear sky", "01d");
 
         // Act
-        boolean isBadWeather = weatherService.isBadWeather(goodWeather);
+        Cause isBadWeather = weatherService.isBadWeather(goodWeather);
 
         // Assert
-        assertFalse(isBadWeather);
+        assertNull(isBadWeather);
     }
 
     @Test
     void givenNotBadEnoughWeather_whenCheckingForBadWeather_thenReturnFalse() {
         // Arrange
-        WeatherInformation.Weather notBadEnoughWeather = new WeatherInformation.Weather(301, "Drizzle", "drizzle", "09d");
+        Weather.Condition notBadEnoughWeather = new Weather.Condition(301, "Drizzle", "drizzle", "09d");
 
         // Act
-        boolean isBadWeather = weatherService.isBadWeather(notBadEnoughWeather);
+        Cause isBadWeather = weatherService.isBadWeather(notBadEnoughWeather);
 
         // Assert
-        assertFalse(isBadWeather);
+        assertNotNull(isBadWeather);
     }
 
     @Test
     void givenBadWeather_whenGetBadWeather_thenReturnBadWeatherElements() {
         // Arrange
-        List<WeatherInformation.Weather> weatherList = List.of(
-                new WeatherInformation.Weather(202, "Thunderstorm", " thunderstorm with heavy rain ", "11d"),
-                new WeatherInformation.Weather(800, "Clear", "clear sky", "01d"),
-                new WeatherInformation.Weather(301, "Drizzle", "drizzle", "09d")
+        List<Weather.Condition> weatherList = List.of(
+                new Weather.Condition(202, "Thunderstorm", " thunderstorm with heavy rain ", "11d"),
+                new Weather.Condition(800, "Clear", "clear sky", "01d"),
+                new Weather.Condition(301, "Drizzle", "drizzle", "09d")
         );
 
         // Act
-        List<WeatherInformation.Weather> badWeather = weatherService.getBadWeather(new WeatherInformation(null, weatherList, null, 0, null, null, null, null));
+        List<Cause> badWeather = weatherService.getBadWeather(new Weather(null, weatherList, null, 0, null, null, null, null));
 
         // Assert
         assertEquals(1, badWeather.size());
@@ -77,13 +80,13 @@ class WeatherServiceTest {
     @Test
     void givenGoodWeather_whenGetBadWeather_thenReturnEmptyList() {
         // Arrange
-        List<WeatherInformation.Weather> weatherList = List.of(
-                new WeatherInformation.Weather(800, "Clear", "clear sky", "01d"),
-                new WeatherInformation.Weather(301, "Drizzle", "drizzle", "09d")
+        List<Weather.Condition> weatherList = List.of(
+                new Weather.Condition(800, "Clear", "clear sky", "01d"),
+                new Weather.Condition(301, "Drizzle", "drizzle", "09d")
         );
 
         // Act
-        List<WeatherInformation.Weather> badWeather = weatherService.getBadWeather(new WeatherInformation(null, weatherList, null, 0, null, null, null, null));
+        List<Cause> badWeather = weatherService.getBadWeather(new Weather(null, weatherList, null, 0, null, null, null, null));
 
         // Assert
         assertTrue(badWeather.isEmpty());

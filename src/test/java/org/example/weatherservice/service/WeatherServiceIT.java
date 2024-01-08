@@ -2,7 +2,7 @@ package org.example.weatherservice.service;
 
 import org.example.weatherservice.config.RestClientConfig;
 import org.example.weatherservice.model.Location;
-import org.example.weatherservice.model.WeatherInformation;
+import org.example.weatherservice.model.Weather;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -41,10 +41,10 @@ class WeatherServiceIT {
         double lon = 12.5038;
 
         // Act
-        WeatherInformation weatherInformation = weatherService.getWeather(lat, lon);
+        Weather weather = weatherService.getWeather(lat, lon);
 
         // Assert
-        assertNotNull(weatherInformation);
-        System.out.println(weatherInformation);
+        assertNotNull(weather);
+        System.out.println(weather);
     }
 }
