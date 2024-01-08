@@ -79,6 +79,23 @@ class WeatherServiceTest {
         assertEquals(1, badWeather.size());
     }
 
+
+    @Test
+    void givenMultipleBadWeather_whenGetBadWeather_thenReturnAll() {
+        // Arrange
+        List<Weather.Condition> weatherList = List.of(
+                new Weather.Condition(202, "Thunderstorm", " thunderstorm with heavy rain ", "11d"),
+                new Weather.Condition(800, "Clear", "clear sky", "01d"),
+                new Weather.Condition(502, "Rain", "heavy intensity rain", "10d")
+        );
+
+        // Act
+        List<Cause> badWeather = weatherService.getBadWeather(new Weather(null, weatherList, null, 0, null, null, null, null));
+
+        // Assert
+        assertEquals(2, badWeather.size());
+    }
+
     @Test
     void givenGoodWeather_whenGetBadWeather_thenReturnEmptyList() {
         // Arrange
