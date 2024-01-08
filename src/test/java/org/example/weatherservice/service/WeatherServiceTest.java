@@ -10,8 +10,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.web.client.RestClient;
 
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 // There's an annotation called @RestClientTest that can be used to test REST clients.
 // But it seems to be made for RestTemplateBuilder and RestClient.Builder, not RestClient itself.
@@ -30,11 +32,11 @@ class WeatherServiceTest {
         Weather.Condition badWeather = new Weather.Condition(202, "Thunderstorm", " thunderstorm with heavy rain ", "11d");
 
         // Act
-        Cause isBadWeather = weatherService.isBadWeather(badWeather);
+        Optional<Cause> weatherCause = weatherService.getWeatherCause(badWeather);
 
         // Assert
-        assertNotNull(isBadWeather);
-        assertEquals(BadWeatherType.THUNDERSTORM, isBadWeather.type());
+        assertTrue(weatherCause.isPresent());
+        assertEquals(BadWeatherType.THUNDERSTORM, weatherCause.get().type());
     }
 
     @Test
@@ -43,10 +45,10 @@ class WeatherServiceTest {
         Weather.Condition goodWeather = new Weather.Condition(800, "Clear", "clear sky", "01d");
 
         // Act
-        Cause isBadWeather = weatherService.isBadWeather(goodWeather);
+        Optional<Cause> weatherCause = weatherService.getWeatherCause(goodWeather);
 
         // Assert
-        assertNull(isBadWeather);
+        assertTrue(weatherCause.isEmpty());
     }
 
     @Test
@@ -55,10 +57,10 @@ class WeatherServiceTest {
         Weather.Condition notBadEnoughWeather = new Weather.Condition(301, "Drizzle", "drizzle", "09d");
 
         // Act
-        Cause isBadWeather = weatherService.isBadWeather(notBadEnoughWeather);
+        Optional<Cause> weatherCause = weatherService.getWeatherCause(notBadEnoughWeather);
 
         // Assert
-        assertNotNull(isBadWeather);
+        assertTrue(weatherCause.isEmpty());
     }
 
     @Test

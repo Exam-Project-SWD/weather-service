@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -46,30 +46,33 @@ public class WeatherService {
     public List<Cause> getBadWeather(Weather weather) {
         // This checks the weather objects.
         // We could also check weather conditions in the main object like visibility or wind.
-        // The return value and structure might need to change in that case.
-        return weather.weather().stream().map(this::isBadWeather).filter(Objects::nonNull).toList();
+        return weather.weather().stream()
+                .map(this::getWeatherCause)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
+        // Can also be done without the second map if we get or else null in the first, then filter on Objects::nonNull.
+        // Feels like that slightly defeats the purpose of Optional though.
     }
 
-    // Possibly rename
-    // Not super elegant that it returns null if the weather is not bad.
-    // But I needed a way to include the type of bad weather if it is bad.
+    // Returns empty Optional if weather is not bad.
+    // I needed a way to include the type of bad weather if it is bad.
     // So it couldn't just return a boolean.
-    // Maybe we could use an Optional instead.
-    public Cause isBadWeather(Weather.Condition weather) {
+    public Optional<Cause> getWeatherCause(Weather.Condition weather) {
         int id = weather.id();
 
-        // check bands of weather codes and check severity
-        // TODO: Redo logic back to broad bands and return Optional
+        // check bands of weather codes and check severity.
+        // we use extra conditions inside the broader if to return early.
         if (id < 300) {
-            return new WeatherCause(BadWeatherType.THUNDERSTORM, weather);
-        } else if (id < 400 && id >= 312) {
-            return new WeatherCause(BadWeatherType.RAIN, weather);
-        } else if (id < 600 && id >= 502) {
-            return new WeatherCause(BadWeatherType.RAIN, weather);
-        } else if (id < 700 && id >= 601) {
-            return new WeatherCause(BadWeatherType.SNOW, weather);
+            return Optional.of(new WeatherCause(BadWeatherType.THUNDERSTORM, weather));
+        } else if (id < 400) {
+            return id >= 312 ? Optional.of(new WeatherCause(BadWeatherType.RAIN, weather)) : Optional.empty();
+        } else if (id < 600) {
+            return id >= 502 ? Optional.of(new WeatherCause(BadWeatherType.RAIN, weather)) : Optional.empty();
+        } else if (id < 700) {
+            return id >= 601 ? Optional.of(new WeatherCause(BadWeatherType.SNOW, weather)) : Optional.empty();
         } else if (id < 800) {
-            return new WeatherCause(BadWeatherType.ATMOSPHERE, weather);
-        } else return null;
+            return Optional.of(new WeatherCause(BadWeatherType.ATMOSPHERE, weather));
+        } else return Optional.empty();
     }
 }
